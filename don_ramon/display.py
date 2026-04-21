@@ -56,7 +56,7 @@ def _build_banner(version: str) -> str:
     use_color = sys.stderr.isatty()
 
     ver_line = f"  Don Ramón v{version}  "
-    author_line = "  Author: Julian Orcinolli  "
+    author_line = "  Author: Julian Orcinoli  "
     qt_line = f"  {quote}  "
     inner_w = max(len(ver_line), len(author_line), len(qt_line))
     ver_line = ver_line.ljust(inner_w)
