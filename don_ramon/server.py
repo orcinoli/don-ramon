@@ -27,6 +27,7 @@ from mcp.server.fastmcp import FastMCP
 from don_ramon.config import load_config, resolve_repo_path
 from don_ramon.indexer import storage
 from don_ramon.indexer.embeddings import embed_one
+from don_ramon.indexer.parser import SUPPORTED_CODE_EXTENSIONS, is_supported_code_file
 
 _REPO_FILTER = os.environ.get("DR_REPO", "")
 
@@ -49,8 +50,10 @@ def _format_results(results: dict) -> str:
     parts = []
     for doc, meta, dist in zip(docs, metas, distances):
         score = round(1 - dist, 3)
+        language = meta.get("language", "unknown")
+        chunk_type = meta.get("chunk_type", meta.get("django_type", "other"))
         header = (
-            f"## {meta['qualified_name']} [{meta['django_type']}] "
+            f"## {meta['qualified_name']} [{language}:{chunk_type}] "
             f"— {meta['file_path']}:{meta['start_line']} "
             f"(score: {score})"
         )
@@ -98,14 +101,12 @@ def search_code(query: str, n_results: int = 5, repo_path: str = "") -> str:
 @mcp.tool()
 def get_file_structure(repo_path: str = "", subpath: str = "") -> str:
     """
-    List .py files in an indexed repo (excluding migrations, __pycache__, etc.).
+    List supported code files in an indexed repo.
 
     Args:
         repo_path: Repo path or alias. Can be omitted if only one repo is indexed.
         subpath: Subdirectory to list (relative to repo root). Empty = root.
     """
-    from don_ramon.config import EXCLUDED_DIRS
-
     target = repo_path or _REPO_FILTER
     if not target:
         cfg = load_config()
@@ -130,12 +131,18 @@ def get_file_structure(repo_path: str = "", subpath: str = "") -> str:
         return f"Path does not exist: {base}"
 
     lines = []
-    for py_file in sorted(base.rglob("*.py")):
-        if any(part in EXCLUDED_DIRS for part in py_file.parts):
+    for code_file in sorted(base.rglob("*")):
+        if not code_file.is_file():
             continue
-        lines.append(str(py_file.relative_to(Path(target))))
+        if not is_supported_code_file(code_file):
+            continue
+        lines.append(str(code_file.relative_to(Path(target))))
 
-    return "\n".join(lines) if lines else "No .py files found."
+    if lines:
+        return "\n".join(lines)
+
+    supported = ", ".join(sorted(SUPPORTED_CODE_EXTENSIONS))
+    return f"No supported code files found. Supported extensions: {supported}"
 
 
 @mcp.tool()

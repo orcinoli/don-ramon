@@ -9,7 +9,7 @@ import typer
 
 app = typer.Typer(
     name="dr",
-    help="Don Ramón — semantic search for Python/Django repos.",
+    help="Don Ramón — semantic search for code repositories.",
     no_args_is_help=False,
     invoke_without_command=True,
 )
@@ -89,7 +89,7 @@ def index(
             chunks = parse_repo(repo_path)
 
         if not chunks:
-            display.warn("No chunks found. Is this a Python repo?")
+            display.warn("No chunks found. Are there supported code files in this repo?")
             return 0
 
         display.ok(f"{len(chunks)} chunks parsed")
@@ -217,7 +217,7 @@ def search(
         for doc, meta, dist in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
             score = round(1 - dist, 3)
             typer.echo(
-                f"\n[{score}] {meta['qualified_name']} ({meta['django_type']}) "
+                f"\n[{score}] {meta['qualified_name']} ({meta.get('language', 'unknown')}:{meta.get('chunk_type', meta.get('django_type', 'other'))}) "
                 f"— {meta['file_path']}:{meta['start_line']}"
             )
             typer.echo("-" * 60)

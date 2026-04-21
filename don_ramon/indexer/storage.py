@@ -59,7 +59,7 @@ def count(repo_path: str) -> int:
 
 
 def _chunk_document(c: CodeChunk) -> str:
-    parts = [f"{c.qualified_name} ({c.django_type}) in {c.file_path}"]
+    parts = [f"{c.qualified_name} ({c.language}:{c.chunk_type}) in {c.file_path}"]
     if c.docstring:
         parts.append(c.docstring)
     parts.append(c.source)
@@ -73,6 +73,7 @@ def _chunk_metadata(c: CodeChunk) -> dict:
         "qualified_name": c.qualified_name,
         "chunk_type": c.chunk_type,
         "django_type": c.django_type,
+        "language": c.language,
         "start_line": c.start_line,
         "end_line": c.end_line,
         "repo_path": "",

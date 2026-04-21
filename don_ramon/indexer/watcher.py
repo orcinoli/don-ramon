@@ -5,18 +5,17 @@ from typing import Callable
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
 from watchdog.observers import Observer
 
-from don_ramon.config import EXCLUDED_DIRS
+from don_ramon.indexer.parser import is_supported_code_file
 
 
-class _PyFileHandler(FileSystemEventHandler):
+class _CodeFileHandler(FileSystemEventHandler):
     def __init__(self, repo_path: Path, on_change: Callable[[Path], None], on_delete: Callable[[Path], None]):
         self._repo_path = repo_path
         self._on_change = on_change
         self._on_delete = on_delete
 
     def _is_relevant(self, path: str) -> bool:
-        p = Path(path)
-        return p.suffix == ".py" and not any(part in EXCLUDED_DIRS for part in p.parts)
+        return is_supported_code_file(Path(path))
 
     def on_modified(self, event: FileSystemEvent) -> None:
         if not event.is_directory and self._is_relevant(event.src_path):
@@ -43,7 +42,7 @@ def watch(
     on_change: Callable[[Path], None],
     on_delete: Callable[[Path], None],
 ) -> None:
-    handler = _PyFileHandler(repo_path, on_change, on_delete)
+    handler = _CodeFileHandler(repo_path, on_change, on_delete)
     observer = Observer()
     observer.schedule(handler, str(repo_path), recursive=True)
     observer.start()
