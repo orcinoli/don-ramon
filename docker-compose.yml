@@ -1,0 +1,15 @@
+services:
+  don-ramon:
+    build: .
+    image: don-ramon:latest
+    volumes:
+      # Persistent storage for ChromaDB + config
+      - don-ramon-data:/root/.don-ramon
+      # Mount your repos as read-only under /repos
+      # Add one entry per repo you want to index:
+      # - /absolute/path/to/your-repo:/repos/your-repo:ro
+    stdin_open: true   # required for MCP stdio transport
+    tty: false
+
+volumes:
+  don-ramon-data:
