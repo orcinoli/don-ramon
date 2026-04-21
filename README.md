@@ -8,7 +8,7 @@ Author: Julian Orcinoli
 
 ---
 
-## Quick Start (Plug and Play)
+## Quick Start
 
 ### 1) Clone the repository
 
@@ -17,61 +17,34 @@ git clone https://github.com/YOUR_USER/don-ramon.git
 cd don-ramon
 ```
 
-### 2) Create the MCP venv (required for Claude Desktop)
+### 2) Create the MCP venv
 
-Don Ramón needs its own venv **outside** your project folder so Claude Desktop (which runs sandboxed on macOS) can reach it:
+Don Ramón needs its own venv **outside** your project folder so AI tools (which run sandboxed on macOS) can reach it:
 
 ```bash
 python3 -m venv ~/.don-ramon/venv
 ~/.don-ramon/venv/bin/pip install -e /absolute/path/to/don-ramon/
 ```
 
-The `dr` command will live at `~/.don-ramon/venv/bin/dr` — that's the path you'll use in the MCP config.
+The `dr` command will live at `~/.don-ramon/venv/bin/dr` — that's the path you'll use in all MCP configs.
 
-> **Dev workflow**: you can also do `pip install -e .` inside a local `.venv` for day-to-day terminal use, but the MCP server must always point to `~/.don-ramon/venv/bin/dr`.
+> **Dev workflow**: you can also do `pip install -e .` inside a local `.venv` for day-to-day terminal use, but MCP configs must always point to `~/.don-ramon/venv/bin/dr`.
 
-### 3) Run first-time setup
+### 3) First-time setup
 
 ```bash
 dr init
 ```
 
-This creates:
+This creates `~/.don-ramon/config.yaml` and `~/.don-ramon/chroma` (vector database).
 
-- `~/.don-ramon/config.yaml`
-- `~/.don-ramon/chroma` (vector database storage)
-
-### 5) Open the interactive console
-
-```bash
-dr
-```
-
-Inside the console you can run commands like `status`, `index`, `search`, and `aliases`.
-
-### 6) Index your first repo
-
-From inside `dr>`:
-
-```bash
-index /absolute/path/to/your/repo --name myrepo
-```
-
-Or from normal terminal:
+### 4) Index your first repo
 
 ```bash
 dr index /absolute/path/to/your/repo --name myrepo
 ```
 
-### 7) Search
-
-Inside `dr>`:
-
-```bash
-search "where is the payment webhook handled?" --repo myrepo
-```
-
-Or from normal terminal:
+### 5) Search
 
 ```bash
 dr search "where is the payment webhook handled?" --repo myrepo
@@ -79,49 +52,27 @@ dr search "where is the payment webhook handled?" --repo myrepo
 
 ---
 
-## Daily Usage
+## MCP Configuration
 
-### Interactive mode
+Don Ramón exposes three MCP tools to any compatible AI agent:
 
-```bash
-dr
-```
-
-Common commands inside `dr>`:
-
-- `status`
-- `aliases`
-- `index /path/to/repo --name alias`
-- `search "your query" --repo alias`
-- `rename alias newalias`
-- `exit`
-
-### Keep index updated while coding
-
-```bash
-dr index /path/to/repo --name myrepo --watch
-```
-
-### Manage aliases
-
-```bash
-dr set-alias /path/to/repo myrepo
-dr rename myrepo mynewrepo
-dr aliases
-```
+| Tool | Description |
+|---|---|
+| `search_code` | Semantic search over indexed repos |
+| `get_file_structure` | List `.py` files in an indexed repo |
+| `list_indexed_repos` | Show all indexed repos with chunk counts |
 
 ---
 
-## Claude Desktop (MCP) Setup
+### Claude Desktop
 
-Config file location:
+Config file:
 - Mac: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
-> **macOS sandbox note**: Claude Desktop cannot access files inside `~/Desktop/`. Always use `~/.don-ramon/venv/bin/dr` as the command — never a venv path under `~/Desktop/`.
+> **macOS sandbox note**: Claude Desktop cannot access files inside `~/Desktop/`. Always use `~/.don-ramon/venv/bin/dr` — never a venv path under `~/Desktop/`.
 
-### Single server (all indexed repos)
-
+**All repos:**
 ```json
 {
   "mcpServers": {
@@ -133,8 +84,7 @@ Config file location:
 }
 ```
 
-### One server per project (recommended)
-
+**Scoped to one project (recommended):**
 ```json
 {
   "mcpServers": {
@@ -150,9 +100,127 @@ Config file location:
 }
 ```
 
-`--repo` accepts an alias (recommended) or an absolute path.
+After saving, restart Claude Desktop.
 
-After saving the config, restart Claude Desktop.
+---
+
+### Claude CLI (claude-code)
+
+**Project-level** — crea el archivo `/tu-proyecto/.claude/mcp.json` (solo aplica a ese proyecto):
+```json
+{
+  "mcpServers": {
+    "don-ramon": {
+      "command": "/Users/YOUR_USER/.don-ramon/venv/bin/dr",
+      "args": ["serve", "--repo", "myproject"]
+    }
+  }
+}
+```
+
+**Global** — aplica a todos los proyectos. Podés agregarlo por CLI:
+```bash
+claude mcp add don-ramon /Users/YOUR_USER/.don-ramon/venv/bin/dr -- serve --repo myproject
+```
+
+O editando directamente `~/.claude/settings.json` (en tu home, no en el proyecto):
+```json
+{
+  "mcpServers": {
+    "don-ramon": {
+      "command": "/Users/YOUR_USER/.don-ramon/venv/bin/dr",
+      "args": ["serve", "--repo", "myproject"]
+    }
+  }
+}
+```
+
+Verificá con:
+```bash
+claude mcp list
+```
+
+---
+
+### Cursor
+
+**Project-level** — crea el archivo `/tu-proyecto/.cursor/mcp.json` (solo aplica a ese proyecto):
+```json
+{
+  "mcpServers": {
+    "don-ramon": {
+      "command": "/Users/YOUR_USER/.don-ramon/venv/bin/dr",
+      "args": ["serve", "--repo", "myproject"]
+    }
+  }
+}
+```
+
+**Global** — crea o editá `~/.cursor/mcp.json` (en tu home, aplica a todos los proyectos):
+```json
+{
+  "mcpServers": {
+    "don-ramon": {
+      "command": "/Users/YOUR_USER/.don-ramon/venv/bin/dr",
+      "args": ["serve", "--repo", "myproject"]
+    }
+  }
+}
+```
+
+Reiniciá Cursor o recargá la ventana. Las herramientas de `don-ramon` van a aparecer en el panel MCP de Cursor.
+
+---
+
+### Gemini CLI
+
+Gemini CLI supports MCP servers via its config file at `~/.gemini/settings.json`.
+
+```json
+{
+  "mcpServers": {
+    "don-ramon": {
+      "command": "/Users/YOUR_USER/.don-ramon/venv/bin/dr",
+      "args": ["serve", "--repo", "myproject"]
+    }
+  }
+}
+```
+
+After saving, restart the Gemini CLI session. The `search_code`, `get_file_structure`, and `list_indexed_repos` tools will be available automatically.
+
+---
+
+## Daily Usage
+
+### Interactive console
+
+```bash
+dr
+```
+
+Commands inside `dr>`:
+
+- `status`
+- `aliases`
+- `index /path/to/repo --name alias`
+- `search "your query" --repo alias`
+- `rename alias newalias`
+- `exit`
+
+### Watch mode (auto-reindex on file changes)
+
+```bash
+dr index /path/to/repo --name myrepo --watch
+```
+
+### Manage aliases
+
+```bash
+dr set-alias /path/to/repo myrepo
+dr rename myrepo mynewrepo
+dr aliases
+```
 
 ---
 
@@ -160,20 +228,20 @@ After saving the config, restart Claude Desktop.
 
 | Command | Description |
 |---|---|
-| `dr` | Open interactive console mode |
-| `dr console` | Open interactive console mode |
+| `dr` | Open interactive console |
+| `dr console` | Open interactive console |
 | `dr init` | First-time setup |
 | `dr index <path>` | Index a repo |
-| `dr index <path> --name <alias>` | Index and assign alias |
+| `dr index <path> --name <alias>` | Index with alias |
 | `dr index <path> --watch` | Index and watch for changes |
-| `dr search "<query>"` | Semantic search across indexed repos |
-| `dr search "<query>" --repo <alias-or-path>` | Search only one repo |
+| `dr search "<query>"` | Semantic search across all repos |
+| `dr search "<query>" --repo <alias>` | Search one repo |
 | `dr status` | Show indexed repos and chunk counts |
-| `dr aliases` | Show alias to repo mapping |
+| `dr aliases` | Show alias → path mapping |
 | `dr set-alias <repo\|alias> <new-name>` | Assign/update alias |
 | `dr rename <repo\|alias> <new-name>` | Rename alias |
-| `dr serve` | Start MCP server for Claude Desktop |
-| `dr serve --repo <alias-or-path>` | Start MCP server scoped to one repo |
+| `dr serve` | Start MCP server (all repos) |
+| `dr serve --repo <alias-or-path>` | Start MCP server (one repo) |
 
 ---
 
@@ -181,28 +249,26 @@ After saving the config, restart Claude Desktop.
 
 ### `dr: command not found`
 
-- Activate your dev venv: `source .venv/bin/activate`
-- Or use the MCP venv directly: `~/.don-ramon/venv/bin/dr --help`
+- Activate dev venv: `source .venv/bin/activate`
+- Or use the MCP venv: `~/.don-ramon/venv/bin/dr --help`
 - Reinstall: `~/.don-ramon/venv/bin/pip install -e /path/to/don-ramon/`
 
 ### MCP server fails to start in Claude Desktop
 
-On macOS, Claude Desktop runs sandboxed and cannot read files from `~/Desktop/`. If your project lives there:
+On macOS, Claude Desktop runs sandboxed and cannot read `~/Desktop/`. If your project lives there:
 
-- Use `~/.don-ramon/venv/bin/dr` as the MCP command (not the `.venv` inside your project)
-- Alternatively, grant Claude Desktop Full Disk Access in *System Preferences → Privacy & Security → Full Disk Access*
+- Use `~/.don-ramon/venv/bin/dr` as the command (not a `.venv` inside your project)
+- Or grant Full Disk Access in *System Preferences → Privacy & Security → Full Disk Access*
 
 ### Python version errors
 
-Use Python 3.11+:
+Requires Python 3.11+:
 
 ```bash
 python --version
 ```
 
 ### No repos indexed
-
-Run:
 
 ```bash
 dr index /path/to/repo --name myrepo
@@ -215,4 +281,4 @@ dr index /path/to/repo --name myrepo
 - Parses Python/Django files into semantic chunks (models, views, serializers, methods, functions)
 - Generates embeddings locally with `sentence-transformers/all-MiniLM-L6-v2`
 - Stores vectors in ChromaDB at `~/.don-ramon/chroma`
-- Exposes search through MCP for Claude Desktop integration
+- Exposes `search_code`, `get_file_structure`, and `list_indexed_repos` via MCP
