@@ -106,7 +106,7 @@ After saving, restart Claude Desktop.
 
 ### Claude CLI (claude-code)
 
-**Project-level** — crea el archivo `/tu-proyecto/.claude/mcp.json` (solo aplica a ese proyecto):
+**Project-level** — create `/your-project/.claude/mcp.json` (applies only to that project):
 ```json
 {
   "mcpServers": {
@@ -118,12 +118,12 @@ After saving, restart Claude Desktop.
 }
 ```
 
-**Global** — aplica a todos los proyectos. Podés agregarlo por CLI:
+**Global** — applies to all projects. Add via CLI:
 ```bash
 claude mcp add don-ramon /Users/YOUR_USER/.don-ramon/venv/bin/dr -- serve --repo myproject
 ```
 
-O editando directamente `~/.claude/settings.json` (en tu home, no en el proyecto):
+Or edit `~/.claude/settings.json` directly (in your home directory, not inside any project):
 ```json
 {
   "mcpServers": {
@@ -135,7 +135,7 @@ O editando directamente `~/.claude/settings.json` (en tu home, no en el proyecto
 }
 ```
 
-Verificá con:
+Verify with:
 ```bash
 claude mcp list
 ```
@@ -144,7 +144,7 @@ claude mcp list
 
 ### Cursor
 
-**Project-level** — crea el archivo `/tu-proyecto/.cursor/mcp.json` (solo aplica a ese proyecto):
+**Project-level** — create `/your-project/.cursor/mcp.json` (applies only to that project):
 ```json
 {
   "mcpServers": {
@@ -156,7 +156,7 @@ claude mcp list
 }
 ```
 
-**Global** — crea o editá `~/.cursor/mcp.json` (en tu home, aplica a todos los proyectos):
+**Global** — create or edit `~/.cursor/mcp.json` (in your home directory, applies to all projects):
 ```json
 {
   "mcpServers": {
@@ -168,7 +168,7 @@ claude mcp list
 }
 ```
 
-Reiniciá Cursor o recargá la ventana. Las herramientas de `don-ramon` van a aparecer en el panel MCP de Cursor.
+Restart Cursor or reload the window. The `don-ramon` tools will appear in Cursor's MCP panel.
 
 ---
 
