@@ -59,7 +59,7 @@ Don Ramón exposes three MCP tools to any compatible AI agent:
 | Tool | Description |
 |---|---|
 | `search_code` | Semantic search over indexed repos |
-| `get_file_structure` | List `.py` files in an indexed repo |
+| `get_file_structure` | List supported code files in an indexed repo |
 | `list_indexed_repos` | Show all indexed repos with chunk counts |
 
 ---
@@ -278,7 +278,7 @@ dr index /path/to/repo --name myrepo
 
 ## How It Works
 
-- Parses Python/Django files into semantic chunks (models, views, serializers, methods, functions)
+- Parses supported code files into semantic chunks (Python AST + heuristic chunking for other languages)
 - Generates embeddings locally with `sentence-transformers/all-MiniLM-L6-v2`
 - Stores vectors in ChromaDB at `~/.don-ramon/chroma`
 - Exposes `search_code`, `get_file_structure`, and `list_indexed_repos` via MCP
