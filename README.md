@@ -26,16 +26,37 @@ cd don-ramon
 
 ### 2) Create the MCP venv
 
-Don Ramón needs its own venv **outside** your project folder so AI tools (which run sandboxed on macOS) can reach it:
+Don Ramón needs its own venv **outside** your project folder so AI tools can reach it consistently.
+
+> On macOS, this is especially important for sandboxed desktop apps.
+
+**macOS / Linux**
 
 ```bash
 python3 -m venv ~/.don-ramon/venv
 ~/.don-ramon/venv/bin/pip install -e /absolute/path/to/don-ramon/
 ```
 
-The `dr` command will live at `~/.don-ramon/venv/bin/dr` — that's the path you'll use in all MCP configs.
+The MCP command path is:
 
-> **Dev workflow**: you can also do `pip install -e .` inside a local `.venv` for day-to-day terminal use, but MCP configs must always point to `~/.don-ramon/venv/bin/dr`.
+```bash
+~/.don-ramon/venv/bin/dr
+```
+
+**Windows (PowerShell)**
+
+```powershell
+py -3 -m venv $HOME\.don-ramon\venv
+$HOME\.don-ramon\venv\Scripts\pip install -e C:\absolute\path\to\don-ramon
+```
+
+The MCP command path is:
+
+```powershell
+C:\Users\YOUR_USER\.don-ramon\venv\Scripts\dr.exe
+```
+
+> **Dev workflow**: you can also do `pip install -e .` inside a local `.venv` for day-to-day terminal use, but MCP configs should always point to this dedicated Don Ramón venv (`.../bin/dr` on macOS/Linux, `...\Scripts\dr.exe` on Windows).
 
 ### 3) First-time setup
 
