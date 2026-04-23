@@ -8,6 +8,13 @@ Author: Julian Orcinoli
 
 ---
 
+## License
+
+This project is licensed under **PolyForm Noncommercial 1.0.0**.  
+See the `LICENSE` file for full terms.
+
+---
+
 ## Quick Start
 
 ### 1) Clone the repository
@@ -275,6 +282,13 @@ dr index /path/to/repo --name myrepo
 ```
 
 ---
+
+## 💼 Commercial Use
+
+Don Ramón is licensed under PolyForm Noncommercial 1.0.0. 
+**If you want to use Don Ramón for your company, internal tools, or commercial products, you need a commercial license.**
+
+Please contact **Julian Orcinoli** at `orcinoli@gmail.com` to discuss licensing options.
 
 ## How It Works
 

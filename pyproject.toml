@@ -1,9 +1,14 @@
+# Don Ramón - Semantic code search for AI agents
+# Copyright (c) 2026 Julian Orcinoli
+# Licensed under PolyForm Noncommercial 1.0.0
+# See LICENSE file for details
+
 [project]
 name = "don-ramon"
 version = "0.1.0"
 description = "The wise neighbor of your codebase. Semantic search MCP server for Python/Django repos."
 authors = [{ name = "Julian Orcinoli", email = "orcinoli@gmail.com" }]
-license = { text = "MIT" }
+license = { text = "PolyForm Noncommercial 1.0.0" }
 requires-python = ">=3.11"
 dependencies = [
     "mcp[cli]>=1.0.0",
