@@ -283,7 +283,7 @@ dr index /path/to/repo --name myrepo
 
 ---
 
-## 💼 Commercial Use
+## Commercial Use
 
 Don Ramón is licensed under PolyForm Noncommercial 1.0.0. 
 **If you want to use Don Ramón for your company, internal tools, or commercial products, you need a commercial license.**
