@@ -17,11 +17,20 @@ See the `LICENSE` file for full terms.
 
 ## Quick Start
 
-### 1) Clone the repository
+### 1) Fork and clone the repository
+
+First, fork this repository to your own GitHub account.
+Then clone **your fork** (not the upstream repository):
 
 ```bash
-git clone https://github.com/YOUR_USER/don-ramon.git
+git clone https://github.com/YOUR_GITHUB_USERNAME/don-ramon.git
 cd don-ramon
+```
+
+Optional: add the original repository as `upstream`:
+
+```bash
+git remote add upstream https://github.com/ORIGINAL_OWNER/don-ramon.git
 ```
 
 ### 2) Create the MCP venv
@@ -47,7 +56,7 @@ The MCP command path is:
 
 ```powershell
 py -3 -m venv $HOME\.don-ramon\venv
-$HOME\.don-ramon\venv\Scripts\pip install -e C:\absolute\path\to\don-ramon
+& "$HOME\.don-ramon\venv\Scripts\pip.exe" install -e "C:\path\to\your\fork\don-ramon"
 ```
 
 The MCP command path is:
@@ -55,6 +64,8 @@ The MCP command path is:
 ```powershell
 C:\Users\YOUR_USER\.don-ramon\venv\Scripts\dr.exe
 ```
+
+> Replace `C:\path\to\your\fork\don-ramon` with the local path where your forked repository is cloned.
 
 > **Dev workflow**: you can also do `pip install -e .` inside a local `.venv` for day-to-day terminal use, but MCP configs should always point to this dedicated Don Ramón venv (`.../bin/dr` on macOS/Linux, `...\Scripts\dr.exe` on Windows).
 
@@ -280,6 +291,45 @@ dr aliases
 - Activate dev venv: `source .venv/bin/activate`
 - Or use the MCP venv: `~/.don-ramon/venv/bin/dr --help`
 - Reinstall: `~/.don-ramon/venv/bin/pip install -e /path/to/don-ramon/`
+
+### Windows: verify `dr` in PATH
+
+```powershell
+# 1) Does PowerShell see dr in this session?
+Get-Command dr -All
+
+# 2) Is it in the current session PATH?
+$env:Path -split ';' | Where-Object { $_ -like '*\.don-ramon\venv\Scripts' }
+
+# 3) Is it in persisted User PATH?
+[Environment]::GetEnvironmentVariable("Path","User") -split ';' | Where-Object { $_ -like '*\.don-ramon\venv\Scripts' }
+```
+
+If it does not appear in (3), add it:
+
+```powershell
+$target = "$HOME\.don-ramon\venv\Scripts"
+$userPath = [Environment]::GetEnvironmentVariable("Path","User")
+if (($userPath -split ';') -notcontains $target) {
+  [Environment]::SetEnvironmentVariable("Path", "$userPath;$target", "User")
+}
+```
+
+Then, important:
+
+1. Close all Cursor terminals.
+2. Fully close and reopen Cursor.
+3. Open a new terminal and run:
+
+```powershell
+dr --help
+```
+
+If you need it immediately in the current session (without restart), run:
+
+```powershell
+$env:Path += ";$HOME\.don-ramon\venv\Scripts"
+```
 
 ### MCP server fails to start in Claude Desktop
 
