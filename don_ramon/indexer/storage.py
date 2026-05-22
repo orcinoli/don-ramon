@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import chromadb
+from chromadb.utils.batch_utils import create_batches
 
 from don_ramon.config import CHROMA_PATH, collection_name_for
 from don_ramon.indexer.parser import CodeChunk
@@ -34,12 +35,20 @@ def get_collection(repo_path: str):
 
 def upsert_chunks(repo_path: str, chunks: list[CodeChunk], embeddings: list[list[float]]) -> None:
     col = get_collection(repo_path)
-    col.upsert(
-        ids=[c.id for c in chunks],
-        embeddings=embeddings,
-        documents=[_chunk_document(c) for c in chunks],
-        metadatas=[{**_chunk_metadata(c), "repo_path": repo_path} for c in chunks],
-    )
+    client = _get_client()
+    ids = [c.id for c in chunks]
+    documents = [_chunk_document(c) for c in chunks]
+    metadatas = [{**_chunk_metadata(c), "repo_path": repo_path} for c in chunks]
+
+    for batch_ids, batch_embeddings, batch_metadatas, batch_documents in create_batches(
+        client, ids, embeddings, metadatas, documents
+    ):
+        col.upsert(
+            ids=batch_ids,
+            embeddings=batch_embeddings,
+            documents=batch_documents,
+            metadatas=batch_metadatas,
+        )
 
 
 def query(repo_path: str, embedding: list[float], n_results: int = 5) -> dict:

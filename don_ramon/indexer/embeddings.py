@@ -19,8 +19,8 @@ def get_model() -> SentenceTransformer:
     return _model
 
 
-def embed(texts: list[str]) -> list[list[float]]:
-    return get_model().encode(texts, show_progress_bar=False).tolist()
+def embed(texts: list[str], batch_size: int = 256) -> list[list[float]]:
+    return get_model().encode(texts, batch_size=batch_size, show_progress_bar=False).tolist()
 
 
 def embed_one(text: str) -> list[float]:
